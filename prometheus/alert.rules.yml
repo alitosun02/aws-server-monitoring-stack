@@ -1,0 +1,29 @@
+groups:
+  - name: server-alerts
+    rules:
+      - alert: HighRAMUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RAM kullanimi %80i gecti"
+          description: "Sunucuda RAM kullanimi {{ $value | printf \"%.1f\" }}% seviyesine ulasti."
+
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk alani kritik seviyede"
+          description: "Disk kullanimi {{ $value | printf \"%.1f\" }}% seviyesine ulasti."
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU kullanimi %90i gecti"
+          description: "CPU kullanimi {{ $value | printf \"%.1f\" }}% seviyesinde."
